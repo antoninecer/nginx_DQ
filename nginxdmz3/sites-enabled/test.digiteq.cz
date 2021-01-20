@@ -1,0 +1,49 @@
+server {
+    server_name test.digiteq.cz;
+    access_log /var/log/nginx/test.access.log;
+    root         /usr/share/nginx/html/test;
+    index index.php index.html index.htm;
+    
+    location / {
+	# if the client-side certificate failed to authenticate, show a 403
+	# message to the client
+	if ($ssl_client_verify != SUCCESS) {
+    	    return 403;
+        }
+
+
+
+	}
+
+	
+	#2fa client certificate
+    ssl_client_certificate /etc/pki/CA/certs/ca.crt;
+    ssl_crl /etc/pki/CA/private/ca.crl;
+    # make verification optional, so we can display a 403 message to those
+    # who fail authentication
+    ssl_verify_client optional;
+
+
+    listen 443 ssl;
+    ssl_certificate /etc/nginx/digiteq.pem; # *.digiteq.cz
+    ssl_certificate_key /etc/nginx/digiteq.key; # klic k  *.digiteq.cz
+         
+#    listen 443 ssl; # managed by Certbot
+#    ssl_certificate /etc/letsencrypt/live/test.digiteq.cz/fullchain.pem; # managed by Certbot
+#    ssl_certificate_key /etc/letsencrypt/live/test.digiteq.cz/privkey.pem; # managed by Certbot
+#    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+#    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+                                                                                                                             server {
+    if ($host = test.digiteq.cz) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    server_name test.digiteq.cz;
+    listen 80;
+    return 404; # managed by Certbot
+
+
+}

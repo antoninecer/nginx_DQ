@@ -1,0 +1,30 @@
+server {
+    server_name docker2.digiteq.cz;
+    access_log /var/log/nginx/docker2.access.log;
+    
+    location / {
+        auth_request /auth;
+	proxy_set_header	Host $host;
+	proxy_set_header	X-Real-IP $remote_addr;
+	proxy_set_header	X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header	X-Forwarded-Proto $scheme;
+	proxy_pass	http://192.168.7.23:5000;
+	proxy_read_timeout	90;
+	proxy_redirect	http://192.168.7.23:5000 http://docker2.digiteq.cz;
+	proxy_set_header	Authorization "Basic Y2xpZW50OjU2b2EzU245N0VURA==";
+	}
+     location = /auth {
+        proxy_pass http://192.168.7.62/auth_artifactory/;
+        }
+    listen 443 ssl;
+    ssl_certificate /etc/nginx/digiteq.pem; # *.digiteq.cz
+    ssl_certificate_key /etc/nginx/digiteq.key; # klic k  *.digiteq.cz
+}
+server {
+    if ($host = docker2.digiteq.cz) {
+        return 301 https://$host$request_uri;
+    } 
+    server_name docker2.digiteq.cz;
+    listen 80;
+    return 404; 
+}

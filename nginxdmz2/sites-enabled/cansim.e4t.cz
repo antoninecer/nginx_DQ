@@ -1,0 +1,38 @@
+server {
+
+    server_name cansim.e4t.cz;
+    access_log /var/log/nginx/cansim.access.log;
+    if ($host = cansim.e4t.cz) {
+        return 301 https://cansim.digiteqautomotive.com;
+    } # managed by Certbot
+        
+        
+location / {
+    proxy_set_header        Host $host;
+    proxy_set_header        X-Real-IP $remote_addr;
+    proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header        X-Forwarded-Proto $scheme;
+    proxy_pass      http://192.168.9.2;
+    proxy_read_timeout      90;
+    proxy_redirect  http://192.168.9.2 http://cansim.e4t.cz;
+    }
+
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/cansim.e4t.cz/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/cansim.e4t.cz/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}server {
+    if ($host = cansim.e4t.cz) {
+        return 301 https://cansim.digiteqautomotive.com;
+    } # managed by Certbot
+
+
+    server_name cansim.e4t.cz;
+    listen 80;
+    return 404; # managed by Certbot
+
+
+}

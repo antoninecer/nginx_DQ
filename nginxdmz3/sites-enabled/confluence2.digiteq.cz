@@ -1,0 +1,30 @@
+server {
+    server_name confluence2.digiteq.cz;
+    access_log /var/log/nginx/confluence2.access.log;
+    
+    
+    location / {
+	proxy_set_header	Host $host;
+	proxy_set_header	X-Real-IP $remote_addr;
+	proxy_set_header	X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header	X-Forwarded-Proto $scheme;
+	proxy_pass	http://192.168.7.220:8090;
+	proxy_read_timeout	90;
+	proxy_redirect	http://192.168.7.220:8090 http://confluence2.digiteq.cz;
+	}
+    listen 443 ssl;
+    ssl_certificate /etc/nginx/digiteq.pem; # *.digiteq.cz
+    ssl_certificate_key /etc/nginx/digiteq.key; # klic k  *.digiteq.cz
+            
+
+}
+
+server {
+    if ($host = confluence2.digiteq.cz) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    server_name confluence2.digiteq.cz;
+    listen 80;
+    return 404; # managed by Certbot
+}

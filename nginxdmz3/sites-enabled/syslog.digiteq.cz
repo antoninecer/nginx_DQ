@@ -1,0 +1,25 @@
+server {
+    listen      443 ssl http2;
+    server_name syslog.digiteq.cz;
+    ssl_certificate /etc/nginx/digiteq.pem; # *.digiteq.cz
+    ssl_certificate_key /etc/nginx/digiteq.key; # klic k  *.digiteq.cz
+    access_log /var/log/nginx/syslog.access.log;
+
+location /
+	{
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Server $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Graylog-Server-URL https://$server_name/;
+	proxy_pass http://192.168.7.32:9000;
+	}
+
+}
+server {
+    server_name syslog.digiteq.cz;
+    listen 80;
+    return 301 https://$host$request_uri;
+    return 404; 
+}
+

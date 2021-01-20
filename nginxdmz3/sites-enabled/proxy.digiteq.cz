@@ -1,0 +1,37 @@
+server {
+    server_name proxy.digiteq.cz;
+    access_log /var/log/nginx/proxy.access.log;
+    root         /usr/share/nginx/html;
+    
+    location / {
+
+	}
+
+	
+
+
+
+
+
+    listen 443 ssl;
+    ssl_certificate /etc/nginx/digiteq.pem; # *.digiteq.cz
+    ssl_certificate_key /etc/nginx/digiteq.key; # klic k  *.digiteq.cz
+         
+#    listen 443 ssl; # managed by Certbot
+#    ssl_certificate /etc/letsencrypt/live/proxy.digiteq.cz/fullchain.pem; # managed by Certbot
+#    ssl_certificate_key /etc/letsencrypt/live/proxy.digiteq.cz/privkey.pem; # managed by Certbot
+#    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+#    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}server {
+    if ($host = proxy.digiteq.cz) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    server_name proxy.digiteq.cz;
+    listen 80;
+    return 404; # managed by Certbot
+
+
+}

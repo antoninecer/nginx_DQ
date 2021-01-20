@@ -1,0 +1,29 @@
+server {
+    server_name jira2.digiteq.cz;
+    access_log /var/log/nginx/jira2.access.log;
+    
+    location / {
+		
+		#proxy_set_header	Host $host;
+		#proxy_set_header	X-Real-IP $remote_addr;
+		#proxy_set_header	X-Forwarded-For $proxy_add_x_forwarded_for;
+		#proxy_set_header	X-Forwarded-Proto $scheme;
+		proxy_set_header	Host jira2.digiteq.cz;
+		client_max_body_size 1000M;
+		        
+		proxy_pass	http://192.168.7.220:8080;
+		proxy_read_timeout	90;
+		proxy_redirect	http://192.168.7.220:8080 http://jira2.digiteq.cz;
+	}
+
+
+    listen 443 ssl;
+    ssl_certificate /etc/nginx/digiteq.crt; # *.digiteq.cz
+    ssl_certificate_key /etc/nginx/digiteq.key; # klic k  *.digiteq.cz
+    
+}
+server {
+	server_name jira2.digiteq.cz;
+    listen 80;
+    return 301 https://$host$request_uri;
+}

@@ -1,0 +1,54 @@
+server {
+    server_name confluence1.digiteq.cz;
+    access_log /var/log/nginx/confluence1.access.log;
+    
+    
+    location / {
+	# if the client-side certificate failed to authenticate, show a 403
+	# message to the client
+#    if ($remote_addr = 192.168.7.254 )
+#    {
+#	proxy_pass	http://192.168.7.120:8090;
+#	break;
+#      }
+
+#	if ($ssl_client_verify != SUCCESS) {
+#    	    return 403;
+#        }
+		
+	proxy_set_header	Host $host;
+	proxy_set_header	X-Real-IP $remote_addr;
+	proxy_set_header	X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header	X-Forwarded-Proto $scheme;
+	proxy_pass	http://192.168.7.120:8090;
+	proxy_read_timeout	90;
+	proxy_redirect	http://192.168.7.120:8090 http://confluence1.digiteq.cz;
+	}
+    listen 443 ssl;
+    ssl_certificate /etc/nginx/digiteq.pem; # *.digiteq.cz
+    ssl_certificate_key /etc/nginx/digiteq.key; # klic k  *.digiteq.cz
+            
+#    listen 443 ssl; # managed by Certbot
+#    ssl_certificate /etc/letsencrypt/live/confluence1.digiteq.cz/fullchain.pem; # managed by Certbot
+#    ssl_certificate_key /etc/letsencrypt/live/confluence1.digiteq.cz/privkey.pem; # managed by Certbot
+#    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+#    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+	#2fa client certificate
+#    ssl_client_certificate /etc/pki/CA/certs/ca.crt;
+#    ssl_crl /etc/pki/CA/private/ca.crl;
+    # make verification optional, so we can display a 403 message to those
+    # who fail authentication
+#    ssl_verify_client optional;
+
+}
+
+server {
+    if ($host = confluence1.digiteq.cz) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    server_name confluence1.digiteq.cz;
+    listen 80;
+    return 404; # managed by Certbot
+}

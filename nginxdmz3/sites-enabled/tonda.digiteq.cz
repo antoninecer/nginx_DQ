@@ -1,0 +1,28 @@
+server {
+    server_name tonda.digiteq.cz;
+    access_log /var/log/nginx/tonda.access.log;
+    listen 443 ssl;
+    
+    location / {
+	proxy_pass      http://192.168.7.111;
+}
+
+
+    ssl_certificate /etc/letsencrypt/live/tonda.digiteq.cz/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/tonda.digiteq.cz/privkey.pem; # managed by Certbot
+}
+
+server {
+    if ($host = tonda.digiteq.cz) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    server_name tonda.digiteq.cz;
+    listen 80;
+    return 301 https://$host$request_uri;
+    
+    return 404; 
+
+
+}
